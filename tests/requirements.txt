@@ -1,0 +1,5 @@
+tox
+coverage
+nose
+nose-exclude
+django-nose

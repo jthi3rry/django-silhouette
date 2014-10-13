@@ -1,0 +1,31 @@
+{% load silhouette_tags %}
+
+{% block formset %}
+    {% block management %}
+        {{ formset.management_form }}
+    {% endblock %}
+
+    {% block errors %}
+        {% form_errors formset %}
+    {% endblock %}
+
+    {% for form in formset %}
+        {% block fields %}
+            {% form_fields form %}
+        {% endblock %}
+
+        {% block controls %}
+            {% block order %}
+                {% if form.ORDER %}
+                    {{ form.ORDER }}
+                {% endif %}
+            {% endblock %}
+
+            {% block delete %}
+                {% if form.DELETE %}
+                    {{ form.DELETE }}
+                {% endif %}
+            {% endblock %}
+        {% endblock %}
+    {% endfor %}
+{% endblock %}

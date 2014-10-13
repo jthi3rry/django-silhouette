@@ -1,0 +1,23 @@
+{% load silhouette_tags silhouette_filters %}
+
+{% if field.is_hidden %}
+    {% field_widget field %}
+{% else %}
+    {% block field %}
+        {% block label %}
+            {% field_label field %}
+        {% endblock %}
+
+        {% block widget %}
+            {% field_widget field %}
+        {% endblock %}
+
+        {% block help_text %}
+            {% field_help_text field %}
+        {% endblock %}
+
+        {% block errors %}
+            {% field_errors field %}
+        {% endblock %}
+    {% endblock %}
+{% endif %}

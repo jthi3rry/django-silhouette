@@ -1,0 +1,3 @@
+{% block controls %}
+    <button type="submit">{{ contents|default_if_none:"Submit"|safe }}</button>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% load silhouette_tags %}
+
+{% block fields %}
+    {% block hidden_fields %}
+        {% for field in form.hidden_fields %}
+            {% field field %}
+        {% endfor %}
+    {% endblock %}
+
+    {% block visible_fields %}
+        {% for field in form.visible_fields %}
+            {% field field %}
+        {% endfor %}
+    {% endblock %}
+{% endblock %}

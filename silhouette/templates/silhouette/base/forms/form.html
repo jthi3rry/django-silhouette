@@ -1,0 +1,30 @@
+{% load silhouette_tags silhouette_filters %}
+{% spaceless %}
+    <form{{ attrs|to_html_attrs }}{% if form.is_multipart and not attrs.enctype %} enctype="multipart/form-data"{% endif %}>
+        {% block csrf %}
+            {% csrf_token %}
+        {% endblock %}
+
+        {% block form %}
+            {% block errors %}
+                {% form_errors form %}
+            {% endblock %}
+
+            {% block fields %}
+                {% form_fields form %}
+            {% endblock %}
+
+            {% block formsets %}
+
+            {% endblock %}
+
+            {% block controls %}
+                {% form_controls form %}
+            {% endblock %}
+
+            {% block media %}
+                {% form_media form %}
+            {% endblock %}
+        {% endblock %}
+    </form>
+{% endspaceless %}

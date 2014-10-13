@@ -1,0 +1,5 @@
+{% if contents or field.help_text %}
+    {% block help_text %}
+        {{ contents|default:field.help_text|safe }}
+    {% endblock %}
+{% endif %}
