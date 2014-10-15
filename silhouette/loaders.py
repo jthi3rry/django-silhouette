@@ -13,7 +13,7 @@ class DefaultLoader(object):
         self.patterns = template_patterns
 
     def get_substitutes(self, obj):
-        if isinstance(obj, forms.Form):
+        if isinstance(obj, forms.BaseForm):
             return {'theme': self.theme,
                     'form': normalize(type(obj).__name__)}
         elif isinstance(obj, BoundField):
