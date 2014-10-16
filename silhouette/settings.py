@@ -7,22 +7,27 @@ PATTERNS = {
         "silhouette/{form}.html",
         "silhouette/{form}/form.html",
         "silhouette/{theme}/forms/form.html",
+        "silhouette/base/forms/form.html",
     ),
     'form_errors': (
         "silhouette/{form}/errors.html",
         "silhouette/{theme}/forms/errors.html",
+        "silhouette/base/forms/errors.html",
     ),
     'form_fields': (
         "silhouette/{form}/fields.html",
         "silhouette/{theme}/forms/fields.html",
+        "silhouette/base/forms/fields.html",
     ),
     'form_controls': (
         "silhouette/{form}/controls.html",
         "silhouette/{theme}/forms/controls.html",
+        "silhouette/base/forms/controls.html",
     ),
     'form_media': (
         "silhouette/{form}/media.html",
         "silhouette/{theme}/forms/media.html",
+        "silhouette/base/forms/media.html",
     ),
     'formset': (
         "silhouette/{form}/formset.html",
