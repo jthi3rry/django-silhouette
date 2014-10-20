@@ -6,19 +6,9 @@ INSTALLED_APPS = [
     'django_nose',
 ]
 
+SILHOUETTE_PATH = 'silhouette'
 
-SILHOUETTE = {
-    'THEME': 'test',
-    'PATTERNS': {
-        "form_test": (
-            "{theme}/{form}.html",
-        ),
-        "field_test": (
-            "{theme}/{form}-{field}-{widget}.html",
-        ),
-    }
-}
-
+SILHOUETTE_THEME = 'theme'
 
 TEST_RUNNER = 'django_nose.BasicNoseRunner'
 

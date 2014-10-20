@@ -1,33 +1,76 @@
 import unittest
 from django.forms.formsets import formset_factory
-from django.template.base import Template
+from django.template.base import Template, TemplateDoesNotExist
+from django.test.utils import override_settings
 
 from tests.mock import forms
 from silhouette.loaders import loader
 
 
+PATH = 'tests'
+
+THEME = 'loader'
+
+PATTERNS = {
+    "test_form": (
+        "{path}/{theme}/{form}.html",
+    ),
+    "test_formset": (
+        "{path}/{theme}/{formset}.html",
+    ),
+    "test_field": (
+        "{path}/{theme}/{form}-{field}-{widget}.html",
+    ),
+    "test_fallback": (
+        "{path}/{theme}/does-not-exist-1-{form}.html",
+        "{path}/{theme}/does-not-exist-2-{form}.html",
+        "{path}/{theme}/fallback-{form}.html",
+    ),
+    "test_notfound": (
+        "{path}/{theme}/does-not-exist-1.html",
+        "{path}/{theme}/does-not-exist-2.html",
+    ),
+}
+
+
 class TestLoaders(unittest.TestCase):
 
-    def setUp(self):
-        self.form = forms.MockForm()
-        self.formset = formset_factory(forms.MockForm)()
-        self.field = self.form['text_input']
+    def test_get_template_for_form(self):
+        obj = forms.MockForm()
+        self.assertIsInstance(loader.get_template(obj, 'test_form', path=PATH, theme=THEME, patterns=PATTERNS), Template)
 
-    def test_get_substitutes_for_forms(self):
-        self.assertDictEqual(loader.get_substitutes(self.form), {'theme': 'test', 'form': 'mock_form'})
+    def test_get_template_for_formset(self):
+        obj = formset_factory(forms.MockForm)()
+        self.assertIsInstance(loader.get_template(obj, 'test_formset', path=PATH, theme=THEME, patterns=PATTERNS), Template)
 
-    def test_get_substitutes_for_formset(self):
-        self.assertDictEqual(loader.get_substitutes(self.formset), {'theme': 'test', 'formset': 'mock_form_form_set'})
+    def test_get_template_for_field(self):
+        obj = forms.MockForm()['text_input']
+        self.assertIsInstance(loader.get_template(obj, 'test_field', path=PATH, theme=THEME, patterns=PATTERNS), Template)
 
-    def test_get_substitutes_for_fields(self):
-        self.assertDictEqual(loader.get_substitutes(self.field), {'theme': 'test', 'field': 'text_input', 'widget': 'text_input', 'form': 'mock_form'})
+    def test_get_template_using_fallback(self):
+        obj = forms.MockForm()
+        self.assertIsInstance(loader.get_template(obj, 'test_fallback', path=PATH, theme=THEME, patterns=PATTERNS), Template)
 
-    def test_get_substitutes_for_unknowns(self):
+    def test_get_template_fail_when_not_found(self):
+        obj = forms.MockForm()
+        with self.assertRaises(TemplateDoesNotExist):
+            loader.get_template(obj, 'test_notfound', path=PATH, theme=THEME, patterns=PATTERNS)
+
+    def test_get_template_fail_when_object_not_supported(self):
         with self.assertRaises(ValueError):
-            loader.get_substitutes(object())
-
-    def test_get_template(self):
-        self.assertIsInstance(loader.get_template('form_test', self.form), Template)
+            loader.get_template(object(), 'test_form', path=PATH, theme=THEME, patterns=PATTERNS)
 
     def test_loader_is_callable(self):
-        self.assertIsInstance(loader('form_test', self.form), Template)
+        obj = forms.MockForm()
+        self.assertIsInstance(loader(obj, 'test_form', path=PATH, theme=THEME, patterns=PATTERNS), Template)
+
+    @override_settings(SILHOUETTE_PATH=PATH, SILHOUETTE_THEME=THEME, SILHOUETTE_PATTERNS=PATTERNS)
+    def test_get_template_with_user_settings_overrides(self):
+        obj = forms.MockForm()
+        self.assertIsInstance(loader.get_template(obj, 'test_form'), Template)
+
+        # Clean up. Django Pods caches settings once loaded. Remove cached settings
+        from silhouette.apps import Silhouette
+        del Silhouette.settings.PATH
+        del Silhouette.settings.THEME
+        del Silhouette.settings.PATTERNS
