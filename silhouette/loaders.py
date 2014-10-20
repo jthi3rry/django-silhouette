@@ -1,6 +1,7 @@
 import re
-from django import forms
-from django.forms.forms import BoundField
+from django.forms.forms import BaseForm, BoundField
+from django.forms.formsets import BaseFormSet
+
 from django.template.loader import select_template
 from .apps import Silhouette
 from .utils import normalize
@@ -13,15 +14,18 @@ class DefaultLoader(object):
         self.patterns = template_patterns
 
     def get_substitutes(self, obj):
-        if isinstance(obj, forms.BaseForm):
+        if isinstance(obj, BaseForm):
             return {'theme': self.theme,
                     'form': normalize(type(obj).__name__)}
+        elif isinstance(obj, BaseFormSet):
+            return {'theme': self.theme,
+                    'formset': normalize(type(obj).__name__)}
         elif isinstance(obj, BoundField):
             return {'theme': self.theme,
                     'form': normalize(type(obj.form).__name__),
                     'field': normalize(obj.name),
                     'widget': normalize(type(obj.field.widget).__name__)}
-        raise ValueError("Object of type {} is not supported".format(type(obj)))
+        raise ValueError("Object of type {} is not supported by {}".format(type(obj), type(self)))
 
     def select_template(self, patterns, substitutes):
         template_list = [pattern.format(**substitutes) for pattern in patterns]

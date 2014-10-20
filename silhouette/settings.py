@@ -30,8 +30,14 @@ PATTERNS = {
         "silhouette/base/forms/media.html",
     ),
     'formset': (
-        "silhouette/{form}/formset.html",
+        "silhouette/{formset}/formset.html",
         "silhouette/{theme}/formsets/formset.html",
+        "silhouette/base/formsets/formset.html",
+    ),
+    'formset_errors': (
+        "silhouette/{formset}/errors.html",
+        "silhouette/{theme}/formsets/errors.html",
+        "silhouette/base/formsets/errors.html",
     ),
     'field': (
         "silhouette/{form}/fields/{field}.html",
