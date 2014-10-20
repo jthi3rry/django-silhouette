@@ -186,17 +186,42 @@ class FormMedia(BaseFormSilhouette):
             return force_text(self.obj.media)
 
 
-@silhouette_tag("formset")
-class Formset(BaseSilhouette):
+class BaseFormSetSilhouette(BaseSilhouette):
+    """
+    Base class for FormSet Silhouette Renderers
+
+    """
 
     @property
     def formset(self):
         return self.obj
 
     def get_extra_context(self):
-        ctx = {'formset': self.formset}
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('fields'), self.kwargs)))
+        return {'formset': self.formset}
+
+
+@silhouette_tag("formset")
+class Formset(BaseFormSetSilhouette):
+
+    def get_extra_context(self):
+        ctx = super(Formset, self).get_extra_context()
+        ctx.update(self.cascade_attrs(self.kwargs, 'errors', 'fields'))
         return ctx
+
+
+@silhouette_tag("formset_errors")
+class FormsetErrors(BaseFormSetSilhouette):
+
+    def get_extra_context(self):
+        ctx = super(FormsetErrors, self).get_extra_context()
+        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('errors'), self.kwargs)))
+        return ctx
+
+    def render(self, context):
+        try:
+            return super(FormsetErrors, self).render(context)
+        except TemplateDoesNotExist:
+            return force_text(self.formset.non_form_errors())
 
 
 class BaseFieldSilhouette(BaseSilhouette):
