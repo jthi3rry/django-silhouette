@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import re
 from django.template import Library
 from django.template.base import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -35,17 +36,45 @@ class BaseSilhouette(object):
     Base class for Silhouette Renderers
 
     """
-    def __init__(self, context, obj, **kwargs):
+    PATH_CONTEXT_KEY = 'silhouette_path'
+    THEME_CONTEXT_KEY = 'silhouette_theme'
+
+    def __init__(self, context, obj, template=None, theme=None, path=None, **kwargs):
         self.context = context
         self.obj = obj
+        self.path_override = path or context.get(self.PATH_CONTEXT_KEY, None)
+        self.theme_override = theme or context.get(self.THEME_CONTEXT_KEY, None)
+        self.template_override = template
         self.kwargs = kwargs
 
     def __enter__(self):
         self.context.update(self.get_extra_context())
+        self.context.update({
+            self.PATH_CONTEXT_KEY: self.path_override,
+            self.THEME_CONTEXT_KEY: self.theme_override
+        })
         return self.context
 
     def __exit__(self, *args, **kwargs):
         self.context.pop()
+
+    @property
+    def template_type(self):
+        """
+        Template type to use when loading the tag template. It corresponds to a key in silhouette.settings.PATTERNS.
+
+        """
+        return normalize(type(self).__name__)
+
+    @property
+    def template(self):
+        """
+        Load a template based on the object's template_type or template_override.
+
+        """
+        if self.template_override:
+            return get_template(self.template_override)
+        return get_silhouette(self.obj, self.template_type, path=self.path_override, theme=self.theme_override)
 
     def build_attrs(self, *holders):
         """
@@ -84,19 +113,19 @@ class BaseSilhouette(object):
         return split_attrs
 
     def cascaded_attrs(self, prefix, context=None):
+        """
+        Retrieve cascaded attributes for prefix from context
+
+        """
         context = context or self.context
         return context.get("{}_attrs".format(prefix), {})
 
     def render(self, context):
-        return get_silhouette(self.silhouette_pattern, self.obj).render(context)
-
-    @property
-    def silhouette_pattern(self):
         """
-        Pattern name to use when loading the tag template
+        Render template using context
 
         """
-        return normalize(type(self).__name__)
+        return self.template.render(context)
 
     def get_extra_context(self):
         """
