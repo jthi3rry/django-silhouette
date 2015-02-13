@@ -1,5 +1,12 @@
+{% load silhouette_filters %}
 {% if field.errors %}
+{% spaceless %}
     {% block errors %}
-        {{ field.errors }}
+        <ul{{ attrs|to_html_attrs }}>
+        {% for error in  field.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
     {% endblock %}
+{% endspaceless %}
 {% endif %}

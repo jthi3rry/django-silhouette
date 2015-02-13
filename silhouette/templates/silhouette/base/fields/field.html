@@ -1,5 +1,5 @@
 {% load silhouette_tags silhouette_filters %}
-
+{% spaceless %}
 {% if field.is_hidden %}
     {% field_widget field %}
 {% else %}
@@ -21,3 +21,4 @@
         {% endblock %}
     {% endblock %}
 {% endif %}
+{% endspaceless %}

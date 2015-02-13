@@ -16,7 +16,7 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=silhouette',
     '--cover-inclusive',
-    '--verbosity=2'
+    '--verbosity=1'
 ]
 
 MIDDLEWARE_CLASSES = []

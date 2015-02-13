@@ -3,11 +3,13 @@ from django.forms.formsets import formset_factory
 from django.template.base import Template, TemplateDoesNotExist
 from django.test.utils import override_settings
 
-from tests.mock import forms
+from .pods_utils import clear_app_settings_cache
+from .mock import forms
+
 from silhouette.loaders import loader
 
 
-PATH = 'tests'
+PATH = 'test_loaders'
 
 THEME = 'loader'
 
@@ -34,6 +36,9 @@ PATTERNS = {
 
 
 class TestLoaders(unittest.TestCase):
+
+    def tearDown(self):
+        clear_app_settings_cache()
 
     def test_get_template_for_form(self):
         obj = forms.MockForm()
@@ -68,9 +73,3 @@ class TestLoaders(unittest.TestCase):
     def test_get_template_with_user_settings_overrides(self):
         obj = forms.MockForm()
         self.assertIsInstance(loader.get_template(obj, 'test_form'), Template)
-
-        # Clean up. Django Pods caches settings once loaded. Remove cached settings
-        from silhouette.apps import Silhouette
-        del Silhouette.settings.PATH
-        del Silhouette.settings.THEME
-        del Silhouette.settings.PATTERNS

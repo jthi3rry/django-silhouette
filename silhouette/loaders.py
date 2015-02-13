@@ -24,7 +24,7 @@ class DefaultLoader(object):
                     'form': normalize(type(obj.form).__name__),
                     'field': normalize(obj.name),
                     'widget': normalize(type(obj.field.widget).__name__)}
-        raise ValueError("Object of type {} is not supported by {}".format(type(obj), type(self)))
+        raise ValueError("Object {} of type {} is not supported by {}".format(obj, type(obj), type(self)))
 
     def get_template(self, obj, template_type, path=None, theme=None, patterns=None):
         path = path or Silhouette.PATH

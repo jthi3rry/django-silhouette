@@ -1,2 +1,2 @@
 Django>=1.6
-django-pods>=0.4
+django-pods>=1.0.1
