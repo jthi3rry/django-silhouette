@@ -48,11 +48,9 @@ class BaseSilhouette(object):
         self.kwargs = kwargs
 
     def __enter__(self):
-        self.context.update(self.get_extra_context())
-        self.context.update({
-            self.PATH_CONTEXT_KEY: self.path_override,
-            self.THEME_CONTEXT_KEY: self.theme_override
-        })
+        scope = {self.PATH_CONTEXT_KEY: self.path_override, self.THEME_CONTEXT_KEY: self.theme_override}
+        scope.update(self.get_extra_context())
+        self.context.update(scope)
         return self.context
 
     def __exit__(self, *args, **kwargs):
@@ -76,7 +74,7 @@ class BaseSilhouette(object):
             return get_template(self.template_override)
         return get_silhouette(self.obj, self.template_type, path=self.path_override, theme=self.theme_override)
 
-    def build_attrs(self, *holders):
+    def merge_attrs(self, *holders):
         """
         Merge html attributes from different holders. CSS classes are concatenated and all
         other attributes are overridden with the rightmost holders taking precedence over
@@ -93,7 +91,7 @@ class BaseSilhouette(object):
             attrs['class'] = ' '.join(set(' '.join([cls.strip() for cls in classes if cls is not None]).split(' ')))
         return attrs
 
-    def cascade_attrs(self, attrs, *prefixes):
+    def build_attrs(self, attrs, *prefixes):
         """
         Nest html attributes by prefix. Non prefixed attributes fall under the default "attrs" key
 
@@ -127,7 +125,7 @@ class BaseSilhouette(object):
         """
         return self.template.render(context)
 
-    def get_extra_context(self):
+    def get_extra_context(self):  # pragma: no cover
         """
         Extra variables for context that are added before rendering and removed after rendering
 
@@ -154,7 +152,7 @@ class Form(BaseFormSilhouette):
 
     def get_extra_context(self):
         ctx = super(Form, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.kwargs, 'errors', 'media', 'controls', 'fields'))
+        ctx.update(self.build_attrs(self.kwargs, 'errors', 'media', 'controls', 'fields'))
         return ctx
 
 
@@ -163,7 +161,7 @@ class FormFields(BaseFormSilhouette):
 
     def get_extra_context(self):
         ctx = super(FormFields, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('fields'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.cascaded_attrs('fields'), self.kwargs)))
         return ctx
 
 
@@ -172,7 +170,7 @@ class FormErrors(BaseFormSilhouette):
 
     def get_extra_context(self):
         ctx = super(FormErrors, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('errors'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.cascaded_attrs('errors'), self.kwargs)))
         return ctx
 
     def render(self, context):
@@ -187,10 +185,10 @@ class FormControls(BaseFormSilhouette):
 
     def get_extra_context(self):
         ctx = super(FormControls, self).get_extra_context()
-        attrs = self.build_attrs(self.cascaded_attrs('controls'), self.kwargs)
+        attrs = self.merge_attrs(self.cascaded_attrs('controls'), self.kwargs)
         non_attrs = {'contents': attrs.pop('contents', None)}
         ctx.update(non_attrs)
-        ctx.update(self.cascade_attrs(attrs))
+        ctx.update(self.build_attrs(attrs))
         return ctx
 
     def render(self, context):
@@ -205,7 +203,7 @@ class FormMedia(BaseFormSilhouette):
 
     def get_extra_context(self):
         ctx = super(FormMedia, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('media'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.cascaded_attrs('media'), self.kwargs)))
         return ctx
 
     def render(self, context):
@@ -215,9 +213,9 @@ class FormMedia(BaseFormSilhouette):
             return force_text(self.obj.media)
 
 
-class BaseFormSetSilhouette(BaseSilhouette):
+class BaseFormsetSilhouette(BaseSilhouette):
     """
-    Base class for FormSet Silhouette Renderers
+    Base class for Formset Silhouette Renderers
 
     """
 
@@ -230,27 +228,21 @@ class BaseFormSetSilhouette(BaseSilhouette):
 
 
 @silhouette_tag("formset")
-class Formset(BaseFormSetSilhouette):
+class Formset(BaseFormsetSilhouette):
 
     def get_extra_context(self):
         ctx = super(Formset, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.kwargs, 'errors', 'fields'))
+        ctx.update(self.build_attrs(self.kwargs, 'errors', 'fields'))
         return ctx
 
 
 @silhouette_tag("formset_errors")
-class FormsetErrors(BaseFormSetSilhouette):
+class FormsetErrors(BaseFormsetSilhouette):
 
     def get_extra_context(self):
         ctx = super(FormsetErrors, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('errors'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.cascaded_attrs('errors'), self.kwargs)))
         return ctx
-
-    def render(self, context):
-        try:
-            return super(FormsetErrors, self).render(context)
-        except TemplateDoesNotExist:
-            return force_text(self.formset.non_form_errors())
 
 
 class BaseFieldSilhouette(BaseSilhouette):
@@ -276,7 +268,7 @@ class BaseFieldSilhouette(BaseSilhouette):
         self.bound_field.field.widget.attrs = self.widget_original_attrs
         super(BaseFieldSilhouette, self).__exit__(*args, **kwargs)
 
-    def get_widget_attrs_for_scope(self, context):
+    def get_widget_attrs_for_scope(self, context):  # pragma: nocover
         """
         Widget attributes for the current scope, as some widget attributes affect attributes of other elements (e.g. label "for" uses the widget's id).
 
@@ -288,11 +280,11 @@ class BaseFieldSilhouette(BaseSilhouette):
 class Field(BaseFieldSilhouette):
 
     def get_widget_attrs_for_scope(self, context):
-        return self.build_attrs(self.bound_field.field.widget.attrs, self.cascaded_attrs('widget', context))
+        return self.merge_attrs(self.bound_field.field.widget.attrs, self.cascaded_attrs('widget', context))
 
     def get_extra_context(self):
         ctx = super(Field, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.kwargs), 'label', 'widget', 'errors', 'help_text'))
+        ctx.update(self.build_attrs(self.merge_attrs(self.kwargs), 'label', 'widget', 'errors', 'help_text'))
         return ctx
 
 
@@ -304,7 +296,7 @@ class FieldWidget(BaseFieldSilhouette):
 
     def get_extra_context(self):
         ctx = super(FieldWidget, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.bound_field.field.widget.attrs, self.cascaded_attrs('widget'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.bound_field.field.widget.attrs, self.cascaded_attrs('widget'), self.kwargs)))
         return ctx
 
     def render(self, context):
@@ -318,14 +310,14 @@ class FieldWidget(BaseFieldSilhouette):
 class FieldLabel(BaseFieldSilhouette):
 
     def get_widget_attrs_for_scope(self, context):
-        return self.build_attrs(self.bound_field.field.widget.attrs, {'id': context.get('attrs', {}).get('for', None)})
+        return self.merge_attrs(self.bound_field.field.widget.attrs, {'id': context.get('attrs', {}).get('for', None)})
 
     def get_extra_context(self):
         ctx = super(FieldLabel, self).get_extra_context()
-        attrs = self.build_attrs(self.cascaded_attrs('label'), self.kwargs)
+        attrs = self.merge_attrs(self.cascaded_attrs('label'), self.kwargs)
         non_attrs = {'contents': attrs.pop('contents', None), 'suffix': attrs.pop('suffix', None)}
         ctx.update(non_attrs)
-        ctx.update(self.cascade_attrs(attrs))
+        ctx.update(self.build_attrs(attrs))
         return ctx
 
     def render(self, context):
@@ -345,10 +337,10 @@ class FieldHelpText(BaseFieldSilhouette):
 
     def get_extra_context(self):
         ctx = super(FieldHelpText, self).get_extra_context()
-        attrs = self.build_attrs(self.cascaded_attrs('help_text'), self.kwargs)
+        attrs = self.merge_attrs(self.cascaded_attrs('help_text'), self.kwargs)
         non_attrs = {'contents': attrs.pop('contents', None)}
         ctx.update(non_attrs)
-        ctx.update(self.cascade_attrs(attrs))
+        ctx.update(self.build_attrs(attrs))
         return ctx
 
     def render(self, context):
@@ -366,7 +358,7 @@ class FieldErrors(BaseFieldSilhouette):
 
     def get_extra_context(self):
         ctx = super(FieldErrors, self).get_extra_context()
-        ctx.update(self.cascade_attrs(self.build_attrs(self.cascaded_attrs('errors'), self.kwargs)))
+        ctx.update(self.build_attrs(self.merge_attrs(self.cascaded_attrs('errors'), self.kwargs)))
         return ctx
 
     def render(self, context):

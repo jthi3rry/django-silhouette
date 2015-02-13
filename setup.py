@@ -42,7 +42,7 @@ setup(
     author='OohlaLabs Limited',
     author_email='packages@oohlalabs.com',
     url='https://bitbucket.org/oohlalabs/django-silhouette/',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     install_requires=[str(ir.req) for ir in parse_requirements('requirements.txt', session=uuid.uuid1())],
     tests_require=['tox'],
     cmdclass={'test': Tox},

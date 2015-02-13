@@ -1,31 +1,36 @@
 {% load silhouette_tags %}
-
+{% spaceless %}
 {% block formset %}
+    {% block non_form_errors %}
+        {% formset_errors formset %}
+    {% endblock %}
+
     {% block management %}
         {{ formset.management_form }}
     {% endblock %}
 
-    {% block errors %}
-        {% formset_errors formset %}
-    {% endblock %}
+    {% for subform in formset %}
+        {% block errors %}
+            {% form_errors subform %}
+        {% endblock %}
 
-    {% for form in formset %}
         {% block fields %}
-            {% form_fields form %}
+            {% form_fields subform %}
         {% endblock %}
 
         {% block controls %}
             {% block order %}
-                {% if form.ORDER %}
-                    {{ form.ORDER }}
+                {% if subform.ORDER %}
+                    {{ subform.ORDER }}
                 {% endif %}
             {% endblock %}
 
             {% block delete %}
-                {% if form.DELETE %}
-                    {{ form.DELETE }}
+                {% if subform.DELETE %}
+                    {{ subform.DELETE }}
                 {% endif %}
             {% endblock %}
         {% endblock %}
     {% endfor %}
 {% endblock %}
+{% endspaceless %}

@@ -1,3 +1,12 @@
+{% load silhouette_filters %}
+{% spaceless %}
 {% block errors %}
-    {{ formset.non_form_errors }}
+    {% if formset.non_form_errors %}
+        <ul{{ attrs|to_html_attrs }}>
+            {% for error in formset.non_form_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}
+{% endspaceless %}

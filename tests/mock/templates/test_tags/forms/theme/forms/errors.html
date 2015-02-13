@@ -1,0 +1,6 @@
+{% load silhouette_tags silhouette_filters %}
+{% spaceless %}
+<ul{{ attrs|to_html_attrs }}>
+    {{ form.non_field_errors }}
+</ul>
+{% endspaceless %}
