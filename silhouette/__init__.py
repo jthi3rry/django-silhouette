@@ -1,3 +1,3 @@
-__version__ = '0.0.1-alpha'
+__version__ = '0.0.1'
 
 default_app_config = 'silhouette.apps.Silhouette'
