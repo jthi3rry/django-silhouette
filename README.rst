@@ -344,6 +344,10 @@ All contributions and comments are welcome.
 Change Log
 ==========
 
+v0.0.2
+------
+* Distribution description & homepage
+
 v0.0.1
 ------
 * Initial release
