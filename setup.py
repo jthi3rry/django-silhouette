@@ -42,7 +42,8 @@ setup(
     author='OohlaLabs Limited',
     author_email='packages@oohlalabs.com',
     url='https://bitbucket.org/oohlalabs/django-silhouette/',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(),
+    include_package_data=True,
     install_requires=[str(ir.req) for ir in parse_requirements('requirements.txt', session=uuid.uuid1())],
     tests_require=['tox'],
     cmdclass={'test': Tox},
@@ -53,7 +54,7 @@ setup(
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
-        "Operating System :: OS Independent"
+        "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
