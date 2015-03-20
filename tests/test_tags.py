@@ -3,7 +3,13 @@ from django.template.base import TemplateDoesNotExist
 
 from django.test import SimpleTestCase
 from django.template.context import Context
-from django.template.loader import get_template_from_string, render_to_string
+
+try:
+    from django.template.loader import get_template_from_string
+except ImportError:
+    from django.template import engines
+    get_template_from_string = engines['django'].from_string
+
 from django.test.utils import override_settings
 
 from .pods_utils import clear_app_settings_cache
