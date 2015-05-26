@@ -2,25 +2,11 @@
 Django Silhouette
 =================
 
+.. image:: https://travis-ci.org/jthi3rry/django-silhouette.svg?branch=master
+    :target: https://travis-ci.org/jthi3rry/django-silhouette
 
-.. image:: https://pypip.in/version/django-silhouette/badge.svg
-    :target: https://pypi.python.org/pypi/django-silhouette/
-
-.. image:: https://pypip.in/format/django-silhouette/badge.svg
-    :target: https://pypi.python.org/pypi/django-silhouette/
-
-.. image:: https://travis-ci.org/OohlaLabs/django-silhouette.svg?branch=master
-    :target: https://travis-ci.org/OohlaLabs/django-silhouette
-
-.. image:: https://coveralls.io/repos/OohlaLabs/django-silhouette/badge.png?branch=master
-    :target: https://coveralls.io/r/OohlaLabs/django-silhouette
-
-.. image:: https://pypip.in/py_versions/django-silhouette/badge.svg
-    :target: https://pypi.python.org/pypi/django-silhouette/
-
-.. image:: https://pypip.in/license/django-silhouette/badge.svg
-    :target: https://pypi.python.org/pypi/django-silhouette/
-
+.. image:: https://coveralls.io/repos/jthi3rry/django-silhouette/badge.png?branch=master
+    :target: https://coveralls.io/r/jthi3rry/django-silhouette
 
 Silhouette is a form templating app for Django just like `Django Crispy Forms <https://github.com/maraujop/django-crispy-forms>`_
 or `Django Floppy Forms <https://github.com/gregmuellegger/django-floppyforms>`_.
