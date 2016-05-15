@@ -2,10 +2,13 @@ from __future__ import unicode_literals
 
 import re
 from django.template import Library
-from django.template.base import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils import six
 from django.utils.encoding import force_text
+try:
+    from django.template.base import TemplateDoesNotExist
+except ImportError:
+    from django.template.exceptions import TemplateDoesNotExist
 
 from ..loaders import get_silhouette
 from ..utils import normalize
