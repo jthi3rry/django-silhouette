@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
-from django.template.base import TemplateDoesNotExist
 
 from django.test import SimpleTestCase
 from django.template.context import Context
-
+try:
+    from django.template.base import TemplateDoesNotExist
+except ImportError:
+    from django.template.exceptions import TemplateDoesNotExist
 try:
     from django.template.loader import get_template_from_string
 except ImportError:

@@ -4,7 +4,10 @@ try:
     from django.template.backends.django import Template
 except ImportError: #  pragma: nocover
     from django.template.base import Template
-from django.template.base import TemplateDoesNotExist
+try:
+    from django.template.base import TemplateDoesNotExist
+except ImportError:
+    from django.template.exceptions import TemplateDoesNotExist
 from django.test.utils import override_settings
 
 from .pods_utils import clear_app_settings_cache
