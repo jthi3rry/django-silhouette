@@ -18,8 +18,21 @@ install:
 script:
   - tox
 
-after_success: coveralls
+after_success:
+  - coveralls
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7* ]]; then export RELEASE_SENTINEL=1; fi
 
-branches:
-  only:
-    - master
+before_deploy:
+  - echo $TRAVIS_TAG > VERSION
+
+deploy:
+  provider: pypi
+  user: OohlaLabs
+  password:
+    secure: df8AwG3zIjzsX06+wNYRwlRXMj5VoQPxPysyCwzA38dCxO6anqoo7Q55G1Ybih4OBShDolrSgBKUDihUuHcrwyfxUqnziPag9vIurbjELUadVpq1ChqOWusw6tcr5fYJZ17+7Kg5pSRICDa9IpwXVe13tMLPga8WcHYxaC926oE=
+  distributions: bdist_wheel
+  on:
+    tags: true
+    repo: jthi3rry/django-silhouette
+    branch: master
+    condition: $RELEASE_SENTINEL = 1
